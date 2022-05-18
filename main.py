@@ -3,6 +3,7 @@ import openpyxl
 import argparse
 import datetime
 import numpy as np
+import dbfread
 
 from pandas import DataFrame
 from dbfread import DBF

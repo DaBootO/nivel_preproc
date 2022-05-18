@@ -220,18 +220,20 @@ for NR in base_set:
             # we only have to work with the dates not present in the date dict
             # as we are changing the date dict we are using the sorted_dates from before
             if checkdate not in sorted_dates:
+                #! old
+                # # as we are using the sorted lists we can compare their indexes
+                # checkdate_index = singular_date_list.index(checkdate)
+                # date_index = singular_date_list.index(date)
                 
-                # as we are using the sorted lists we can compare their indexes
-                checkdate_index = singular_date_list.index(checkdate)
-                date_index = singular_date_list.index(date)
+                # # this little algorithm checks if the checkdate is smaller than the date
+                # # if it is -> it will set checkdate to the height of date
+                # # because we use sorted lists we are going up from the earliest date
+                # # each checkdate is compared to every date but because we are going from earliest to latest
+                # # we are overwriting earlier 'wrong' data
+                # if checkdate_index > date_index:
+                #     base_set[NR][2][checkdate] = base_set[NR][2][date]
                 
-                # this little algorithm checks if the checkdate is smaller than the date
-                # if it is -> it will set checkdate to the height of date
-                # because we use sorted lists we are going up from the earliest date
-                # each checkdate is compared to every date but because we are going from earliest to latest
-                # we are overwriting earlier 'wrong' data
-                if checkdate_index > date_index:
-                    base_set[NR][2][checkdate] = base_set[NR][2][date]
+                base_set[NR][2][checkdate] = '-42000000,000'
 
 # put it all back into a DataFrame (tbh could have done it earlier - mb sry)
 output_df = DataFrame()
@@ -239,6 +241,9 @@ output_df = DataFrame()
 output_df['NR'] = list(base_set)
 output_df['X'] = [base_set[key][0] for key in base_set]
 output_df['Y'] = [base_set[key][1] for key in base_set]
+output_df['Easting'] = [base_set[key][0] for key in base_set]
+output_df['Northing'] = [base_set[key][1] for key in base_set]
+output_df['Height'] = ['0,000']*len(output_df)
 
 for date in singular_date_list:
     # nested list comprehension with further if clauses checking and taking data from dict is always funny
@@ -246,10 +251,10 @@ for date in singular_date_list:
 
 # output to .txt file
 fmt_list = ['%s']*len(output_df.columns)
-header_txt = ' '.join(list(output_df.columns.values))
+header_txt = ';'.join(list(output_df.columns.values))
 
 # if there was no output filename given revert to a default
 if ofn == None:
     ofn = 'nivel_preproc.txt'
 
-np.savetxt(ofn, output_df.values, fmt=fmt_list, header=header_txt)
+np.savetxt(ofn, output_df.values, fmt=fmt_list, header=header_txt, delimiter=';', comments='')

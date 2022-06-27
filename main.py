@@ -35,9 +35,9 @@ def load_data(filename):
             wb = openpyxl.load_workbook(filename=filename)
             ws = wb[wb.sheetnames[0]]
             data = ws.values
-            cols = next(data)[1:]
+            cols = next(data)[0:]
             data = list(data)
-            data = (islice(r, 1, None) for r in data)
+            data = (islice(r, 0, None) for r in data)
             df = DataFrame(data, columns=cols)
             
             return df
@@ -174,7 +174,7 @@ base_set = {}
 
 with tqdm(total=len(data)) as pbar:
     for index, row in data.iterrows():
-        NR = row['Punktname_']
+        NR = row['Punktname']
         X_koord = row['X']
         Y_koord = row['Y']
         Z_koord = row['Z']
@@ -182,6 +182,13 @@ with tqdm(total=len(data)) as pbar:
         if NR not in base_set.keys():
             base_set[NR] = [X_koord, Y_koord, {date: Z_koord}]
         else:
+            # check for unset coordinates -> unset means 0.000
+            if base_set[NR][0] == 0.0:
+                base_set[NR][0] = X_koord
+            
+            if base_set[NR][1] == 0.0:
+                base_set[NR][1] = Y_koord
+            
             base_set[NR][2][date] = Z_koord
         pbar.update(1)
 
